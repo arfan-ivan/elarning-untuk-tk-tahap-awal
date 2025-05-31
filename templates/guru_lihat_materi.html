@@ -1,0 +1,1127 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Materi - {{ kelas.nama_kelas }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5">
+    <!-- Enhanced Header Section with Glass Morphism -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="hero-header position-relative overflow-hidden rounded-5 p-5 text-white shadow-lg">
+                <!-- Animated Background Elements -->
+                <div class="floating-shapes">
+                    <div class="shape shape-1"></div>
+                    <div class="shape shape-2"></div>
+                    <div class="shape shape-3"></div>
+                    <div class="shape shape-4"></div>
+                </div>
+                
+                <!-- Gradient Overlay -->
+                <div class="gradient-overlay"></div>
+                
+                <!-- Header Content -->
+                <div class="row align-items-center position-relative z-3">
+                    <div class="col-lg-8">
+                        <div class="hero-content">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper me-4">
+                                    <i class="bi bi-collection-play"></i>
+                                </div>
+                                <div>
+                                    <h1 class="display-5 fw-bold mb-2 text-gradient">
+                                        Materi {{ kelas.nama_kelas }}
+                                    </h1>
+                                    <!-- <div class="class-info">
+                                        <span class="badge-glass">
+                                            <i class="bi bi-mortarboard me-2"></i>
+                                            {{ kelas.nama_kelas }}
+                                        </span>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                        <div class="action-buttons">
+                            <a href="{{ url_for('guru_kelas') }}" class="btn btn-glass me-3 mb-2">
+                                <i class="bi bi-arrow-left me-2"></i>Kembali
+                            </a>
+                            <a href="{{ url_for('guru_tambah_materi', kelas_id=kelas.id) }}" class="btn btn-primary-glow">
+                                <i class="bi bi-plus-circle me-2"></i>Tambah Materi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if materis %}
+        <!-- Enhanced Statistics Cards -->
+        <div class="row mb-5 materi-informasi">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ materis|length }}</h3>
+                        <p>Total Materi</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ materis|selectattr('is_published')|list|length }}</h3>
+                        <p>Dipublikasi</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="bi bi-pencil"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ materis|rejectattr('is_published')|list|length }}</h3>
+                        <p>Draft</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-info">
+                        <i class="bi bi-paperclip"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ materis|selectattr('file_path')|list|length }}</h3>
+                        <p>File Lampiran</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Materi Cards Grid -->
+        <div class="materi-grid">
+            {% for materi in materis %}
+            <div class="materi-card-wrapper">
+                <div class="materi-card glass-card">
+                    <!-- Card Header -->
+                    <div class="card-header-custom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="materi-title">
+                                    <h5 class="fw-bold mb-2">
+                                        <i class="bi bi-file-text me-2 text-primary"></i>
+                                        {{ materi.judul }}
+                                    </h5>
+                                </div>
+                                
+                                <!-- Enhanced Status Badges -->
+                                <div class="badges-container mb-3">
+                                    <span class="badge-modern badge-primary">
+                                        <i class="bi bi-book me-1"></i>{{ materi.mata_pelajaran|title }}
+                                    </span>
+                                    {% if materi.topik %}
+                                        <span class="badge-modern badge-secondary">
+                                            <i class="bi bi-tag me-1"></i>{{ materi.topik }}
+                                        </span>
+                                    {% endif %}
+                                    {% if not materi.is_published %}
+                                        <span class="badge-modern badge-warning pulse">
+                                            <i class="bi bi-pencil me-1"></i>Draft
+                                        </span>
+                                    {% else %}
+                                        <span class="badge-modern badge-success">
+                                            <i class="bi bi-check-circle me-1"></i>Published
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Enhanced Actions Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn-action-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu-custom shadow-lg">
+                                    <li>
+                                        <a class="dropdown-item-custom" href="{{ url_for('guru_lihat_materi', kelas_id=kelas.id, materi_id=materi.id) }}">
+                                            <div class="action-icon bg-info">
+                                                <i class="bi bi-eye"></i>
+                                            </div>
+                                            <div class="action-content">
+                                                <span class="action-title">Lihat Detail</span>
+                                                <small>Buka materi lengkap</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item-custom" href="{{ url_for('guru_edit_materi', kelas_id=kelas.id, materi_id=materi.id) }}">
+                                            <div class="action-icon bg-warning">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </div>
+                                            <div class="action-content">
+                                                <span class="action-title">Edit</span>
+                                                <small>Ubah konten materi</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider-custom"></li>
+                                    <li>
+                                        <form method="POST" action="{{ url_for('guru_delete_materi', kelas_id=kelas.id, materi_id=materi.id) }}" style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <button type="submit" class="dropdown-item-custom text-danger" 
+                                                    onclick="return confirm('Apakah Anda yakin ingin menghapus materi ini?')">
+                                                <div class="action-icon bg-danger">
+                                                    <i class="bi bi-trash3"></i>
+                                                </div>
+                                                <div class="action-content">
+                                                    <span class="action-title">Hapus</span>
+                                                    <small>Hapus permanen</small>
+                                                </div>
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body-custom">
+                        {% if materi.konten %}
+                            <div class="content-preview-enhanced">
+                                <p class="content-text">
+                                    {{ materi.konten[:150] }}{% if materi.konten|length > 150 %}...{% endif %}
+                                </p>
+                                <div class="read-more-gradient"></div>
+                            </div>
+                        {% endif %}
+
+                        {% if materi.file_path %}
+                            <div class="file-attachment-enhanced">
+                                <div class="file-card">
+                                    <div class="file-icon-container">
+                                        {% if materi.file_type == 'pdf' %}
+                                            <div class="file-icon pdf-icon">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            </div>
+                                        {% elif materi.file_type in ['doc', 'docx'] %}
+                                            <div class="file-icon doc-icon">
+                                                <i class="bi bi-file-earmark-word"></i>
+                                            </div>
+                                        {% elif materi.file_type in ['ppt', 'pptx'] %}
+                                            <div class="file-icon ppt-icon">
+                                                <i class="bi bi-file-earmark-ppt"></i>
+                                            </div>
+                                        {% else %}
+                                            <div class="file-icon default-icon">
+                                                <i class="bi bi-file-earmark"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="file-info">
+                                        <div class="file-type">{{ materi.file_type|upper }} File</div>
+                                        <small class="file-desc">File Lampiran</small>
+                                    </div>
+                                    <a href="/uploads/{{ materi.file_path }}" 
+                                       class="file-view-btn" 
+                                       target="_blank">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="card-footer-custom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="creation-date">
+                                <i class="bi bi-calendar3 me-2"></i>
+                                <span>{{ materi.created_at.strftime('%d %b %Y') if materi.created_at else '-' }}</span>
+                            </div>
+                            <a href="{{ url_for('guru_lihat_materi', kelas_id=kelas.id, materi_id=materi.id) }}" 
+                               class="view-detail-btn">
+                                <span>Lihat Detail</span>
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Enhanced Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-content">
+                <div class="empty-illustration">
+                    <div class="empty-icon">
+                        <i class="bi bi-journal-bookmark"></i>
+                    </div>
+                    <div class="empty-circles">
+                        <div class="circle circle-1"></div>
+                        <div class="circle circle-2"></div>
+                        <div class="circle circle-3"></div>
+                    </div>
+                </div>
+                <h3 class="empty-title">Belum Ada Materi Pembelajaran</h3>
+                <p class="empty-subtitle">
+                    Mulai berbagi pengetahuan dengan menambahkan materi pembelajaran pertama untuk kelas ini.
+                </p>
+                <a href="{{ url_for('guru_tambah_materi', kelas_id=kelas.id) }}" 
+                   class="btn btn-primary-glow btn-lg">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Tambah Materi Pertama
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<!-- Enhanced Custom Styles -->
+<style>
+/* Variables */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.15);
+    --border-radius: 1rem;
+    --border-radius-lg: 1.5rem;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hero Header */
+.hero-header {
+    background: var(--primary-gradient);
+    position: relative;
+    min-height: 200px;
+    overflow: hidden;
+}
+
+.floating-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.shape {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+    width: 80px;
+    height: 80px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 120px;
+    height: 120px;
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 60px;
+    height: 60px;
+    top: 10%;
+    right: 30%;
+    animation-delay: 4s;
+}
+
+.shape-4 {
+    width: 100px;
+    height: 100px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 1s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.icon-wrapper i {
+    font-size: 2rem;
+    color: white;
+}
+
+.text-gradient {
+    background: linear-gradient(45deg, #fff, #e0e7ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.badge-glass {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem;
+}
+
+.btn-glass {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-primary-glow {
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    border: none;
+    box-shadow: 0 8px 32px rgba(255, 107, 107, 0.3);
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.btn-primary-glow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(255, 107, 107, 0.4);
+    color: white;
+}
+
+/* Statistics Cards */
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-icon.bg-primary { background: var(--primary-gradient); }
+.stat-icon.bg-success { background: var(--success-gradient); }
+.stat-icon.bg-warning { background: var(--warning-gradient); }
+.stat-icon.bg-info { background: var(--secondary-gradient); }
+
+.stat-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #2d3748;
+}
+
+.stat-content p {
+    margin: 0;
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+/* Materi Grid */
+.materi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.materi-informasi {
+    padding-top: 10px;
+    padding-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.5rem;
+}
+.materi-card-wrapper {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.materi-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+    height: 100%;
+}
+
+.materi-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+}
+
+.card-header-custom {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.materi-title h5 {
+    color: #2d3748;
+    font-size: 1.25rem;
+    line-height: 1.4;
+}
+
+.badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.badge-modern {
+    padding: 0.4rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid transparent;
+}
+
+.badge-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.badge-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.badge-warning {
+    background: linear-gradient(45deg, #f6ad55, #ed8936);
+    color: white;
+}
+
+.badge-success {
+    background: linear-gradient(45deg, #48bb78, #38a169);
+    color: white;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Action Button */
+.btn-action-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.btn-action-toggle:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+/* Enhanced Dropdown */
+.dropdown-menu-custom {
+    background: white;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    min-width: 280px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item-custom {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: var(--transition);
+    text-decoration: none;
+    color: #2d3748;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdown-item-custom:hover {
+    background: #f7fafc;
+    transform: translateX(5px);
+    color: #2d3748;
+}
+
+.action-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.action-content {
+    flex-grow: 1;
+}
+
+.action-title {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.action-content small {
+    color: #718096;
+    font-size: 0.75rem;
+}
+
+.dropdown-divider-custom {
+    margin: 0.5rem 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Card Body */
+.card-body-custom {
+    padding: 1.5rem;
+}
+
+.content-preview-enhanced {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.content-text {
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.read-more-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(transparent, white);
+}
+
+/* File Attachment */
+.file-attachment-enhanced {
+    margin-top: 1rem;
+}
+
+.file-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: var(--border-radius);
+    border: 2px dashed #e2e8f0;
+    transition: var(--transition);
+}
+
+.file-card:hover {
+    border-color: #667eea;
+    background: #edf2f7;
+}
+
+.file-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.pdf-icon { background: linear-gradient(45deg, #dc2626, #ef4444); }
+.doc-icon { background: linear-gradient(45deg, #2563eb, #3b82f6); }
+.ppt-icon { background: linear-gradient(45deg, #d97706, #f59e0b); }
+.default-icon { background: linear-gradient(45deg, #6b7280, #9ca3af); }
+
+.file-info {
+    flex-grow: 1;
+}
+
+.file-type {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.file-desc {
+    color: #718096;
+    font-size: 0.8rem;
+}
+
+.file-view-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.file-view-btn:hover {
+    background: #5a67d8;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Card Footer */
+.card-footer-custom {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.creation-date {
+    color: #718096;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+}
+
+.view-detail-btn {
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+}
+
+.view-detail-btn:hover {
+    background: #5a67d8;
+    color: white;
+    transform: translateX(5px);
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+}
+
+.empty-state-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.empty-illustration {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.empty-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #a0aec0;
+    position: relative;
+    z-index: 2;
+}
+
+.empty-circles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.circle {
+    position: absolute;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    animation: ripple 3s infinite;
+}
+
+.circle-1 {
+    width: 80px;
+    height: 80px;
+    top: -40px;
+    left: -40px;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 120px;
+    height: 120px;
+    top: -60px;
+    left: -60px;
+    animation-delay: 1s;
+}
+
+.circle-3 {
+    width: 160px;
+    height: 160px;
+    top: -80px;
+    left: -80px;
+    animation-delay: 2s;
+}
+
+@keyframes ripple {
+    0% {
+        opacity: 1;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+}
+
+.empty-title {
+    color: #2d3748;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.empty-subtitle {
+    color: #718096;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .materi-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .hero-header {
+        padding: 2rem !important;
+        text-align: center;
+    }
+    
+    .hero-content .d-flex {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        margin: 0 !important;
+    }
+    
+    .materi-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dropdown-menu-custom {
+        min-width: 250px;
+    }
+    
+    .file-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-header {
+        padding: 1.5rem !important;
+    }
+    
+    .display-5 {
+        font-size: 1.75rem;
+    }
+    
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+    }
+    
+    .card-header-custom,
+    .card-body-custom,
+    .card-footer-custom {
+        padding: 1rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --glass-bg: rgba(0, 0, 0, 0.2);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+    
+    .materi-card {
+        background: #1a202c;
+        border-color: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        border-color: #4a5568;
+    }
+    
+    .card-footer-custom {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .materi-title h5 {
+        color: #e2e8f0;
+    }
+    
+    .content-text {
+        color: #a0aec0;
+    }
+    
+    .creation-date {
+        color: #a0aec0;
+    }
+    
+    .file-card {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .file-type {
+        color: #e2e8f0;
+    }
+    
+    .file-desc {
+        color: #a0aec0;
+    }
+    
+    .stat-card {
+        background: #1a202c;
+        border-color: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .stat-content h3 {
+        color: #e2e8f0;
+    }
+    
+    .stat-content p {
+        color: #a0aec0;
+    }
+    
+    .dropdown-menu-custom {
+        background: #1a202c;
+        border-color: #2d3748;
+    }
+    
+    .dropdown-item-custom {
+        color: #e2e8f0;
+    }
+    
+    .dropdown-item-custom:hover {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .empty-title {
+        color: #e2e8f0;
+    }
+    
+    .empty-subtitle {
+        color: #a0aec0;
+    }
+}
+
+/* Performance optimizations */
+.materi-card,
+.stat-card,
+.btn-glass,
+.btn-primary-glow {
+    will-change: transform;
+}
+
+/* Accessibility improvements */
+.btn-action-toggle:focus,
+.file-view-btn:focus,
+.view-detail-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .floating-shapes,
+    .gradient-overlay,
+    .btn-glass,
+    .btn-primary-glow,
+    .btn-action-toggle,
+    .dropdown {
+        display: none !important;
+    }
+    
+    .materi-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .hero-header {
+        background: #f8f9fa !important;
+        color: #000 !important;
+    }
+}
+</style>
+{% endblock %}

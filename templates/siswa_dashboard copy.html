@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Siswa - E-Learning System{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Dashboard Siswa</h1>
+    <p>Selamat datang, {{ current_user.nama_lengkap }}!</p>
+    
+    <div>
+        <h2>Ringkasan</h2>
+        <div>
+            <div>
+                <h3>{{ kelas_siswa|length }}</h3>
+                <p>Kelas Diikuti</p>
+            </div>
+            <div>
+                <h3>{{ tugas_pending }}</h3>
+                <p>Tugas Pending</p>
+            </div>
+            <div>
+                <h3>{{ quiz_available }}</h3>
+                <p>Quiz Tersedia</p>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <h2>Kelas yang Diikuti</h2>
+        {% if kelas_siswa %}
+            <div>
+                {% for kelas in kelas_siswa %}
+                <div>
+                    <h3>{{ kelas.nama_kelas }}</h3>
+                    <p>{{ kelas.deskripsi or 'Tidak ada deskripsi' }}</p>
+                    <p><strong>Guru:</strong> {{ kelas.guru.nama_lengkap }}</p>
+                    <p><strong>Kode Kelas:</strong> {{ kelas.kode_kelas }}</p>
+                    
+                    <div>
+                        <a href="{{ url_for('siswa_view_kelas', kelas_id=kelas.id) }}">Lihat Kelas</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Anda belum mengikuti kelas apapun. <a href="{{ url_for('siswa_join_kelas') }}">Bergabung dengan kelas</a></p>
+        {% endif %}
+    </div>
+    
+    <div>
+        <h2>Menu Siswa</h2>
+        <ul>
+            <li><a href="{{ url_for('siswa_my_kelas') }}">Lihat Semua Kelas</a></li>
+            <li><a href="{{ url_for('siswa_join_kelas') }}">Bergabung Kelas Baru</a></li>
+        </ul>
+    </div>
+    
+    {% if tugas_pending > 0 or quiz_available > 0 %}
+    <div>
+        <h2>Pemberitahuan</h2>
+        {% if tugas_pending > 0 %}
+            <div>
+                <strong>Perhatian!</strong> Anda memiliki {{ tugas_pending }} tugas yang belum dikerjakan.
+            </div>
+        {% endif %}
+        {% if quiz_available > 0 %}
+            <div>
+                <strong>Info!</strong> Ada {{ quiz_available }} quiz yang tersedia untuk dikerjakan.
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

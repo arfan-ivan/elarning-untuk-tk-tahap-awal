@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - E-Learning System{% endblock %}
+
+{% block content %}
+<style>
+/* CSS untuk Dashboard Admin dengan tema biru profesional */
+.admin-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.welcome-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.welcome-header h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.stats-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.content-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.modern-table thead {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.modern-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    border: none;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modern-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.modern-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.modern-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.admin-menu {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+}
+
+.menu-item {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.menu-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+}
+
+.menu-link {
+    display: block;
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    color: #475569;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.menu-item:hover .menu-link {
+    color: #1e40af;
+}
+
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+@media (max-width: 768px) {
+    .admin-dashboard {
+        padding: 1rem;
+    }
+    
+    .welcome-header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .content-card, .admin-menu {
+        padding: 1.5rem;
+    }
+    
+    .modern-table {
+        font-size: 0.8rem;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+</style>
+
+<div class="admin-dashboard">
+    <div class="dashboard-container">
+        <!-- Welcome Header -->
+        <div class="welcome-header">
+            <h1>Dashboard Administrator</h1>
+            <p>Selamat datang, {{ current_user.nama_lengkap }}!</p>
+        </div>
+        
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h2 class="section-title">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Statistik Sistem
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">{{ total_guru }}</span>
+                    <p class="stat-label">Total Guru</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{ total_siswa }}</span>
+                    <p class="stat-label">Total Siswa</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{ total_kelas }}</span>
+                    <p class="stat-label">Total Kelas</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{ total_users }}</span>
+                    <p class="stat-label">Total User</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Users Section -->
+        <div class="content-card">
+            <h2 class="section-title" style="color: #1e40af; text-shadow: none; margin-bottom: 1.5rem;">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M16 7c0-2.21-1.79-4-4-4S8 4.79 8 7s1.79 4 4 4 4-1.79 4-4zM12 14c-3.31 0-6 2.69-6 6h12c0-3.31-2.69-6-6-6z"/>
+                </svg>
+                User Terbaru
+            </h2>
+            {% if recent_users %}
+                <div class="table-container">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Tanggal Daftar</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td><strong>{{ user.nama_lengkap }}</strong></td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td><span style="color: #3b82f6; font-weight: 600;">{{ user.role.title() }}</span></td>
+                                <td>{{ user.tanggal_daftar.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="status-badge status-active">Aktif</span>
+                                    {% else %}
+                                        <span class="status-badge status-inactive">Nonaktif</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>Belum ada user terdaftar.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Admin Menu Section -->
+        <div class="admin-menu">
+            <h2 class="section-title" style="color: #1e40af; text-shadow: none; margin-bottom: 1.5rem;">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Menu Administrasi
+            </h2>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="{{ url_for('admin_users') }}" class="menu-link">
+                        <svg class="icon" style="display: inline-block; margin-right: 0.5rem; vertical-align: middle;" viewBox="0 0 24 24">
+                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5S12 9.67 12 10.5V18h2v-7.5c0-.83.67-1.5 1.5-1.5S17 9.67 17 10.5V18h2v-8c0-2.21-1.79-4-4-4H9c-2.21 0-4 1.79-4 4v8h3z"/>
+                        </svg>
+                        Kelola Semua User
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url_for('admin_add_user') }}" class="menu-link">
+                        <svg class="icon" style="display: inline-block; margin-right: 0.5rem; vertical-align: middle;" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Tambah User Baru
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url_for('guru_kelas') }}" class="menu-link">
+                        <svg class="icon" style="display: inline-block; margin-right: 0.5rem; vertical-align: middle;" viewBox="0 0 24 24">
+                            <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6L23 9l-11-6zM5 13.18l7 3.82 7-3.82V15l-7 3.82L5 15v-1.82z"/>
+                        </svg>
+                        Lihat Semua Kelas
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

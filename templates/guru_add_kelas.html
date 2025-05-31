@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Kelas Baru - E-Learning{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2>Tambah Kelas Baru</h2>
+            
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.nama_kelas.label(class="form-label") }}
+                    {{ form.nama_kelas(class="form-control") }}
+                    {% if form.nama_kelas.errors %}
+                        <div class="text-danger">
+                            {% for error in form.nama_kelas.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.deskripsi.label(class="form-label") }}
+                    {{ form.deskripsi(class="form-control", rows="4") }}
+                    {% if form.deskripsi.errors %}
+                        <div class="text-danger">
+                            {% for error in form.deskripsi.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Buat Kelas</button>
+                    <a href="{{ url_for('guru_kelas') }}" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+
+            <div class="alert alert-info">
+                <h6>Informasi:</h6>
+                <ul>
+                    <li>Kode kelas akan dibuat otomatis setelah kelas berhasil dibuat</li>
+                    <li>Bagikan kode kelas kepada siswa untuk bergabung</li>
+                    <li>Anda dapat mengelola siswa setelah kelas dibuat</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

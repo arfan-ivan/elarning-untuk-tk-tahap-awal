@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Kelas - E-Learning{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1e3a8a;
+        --secondary-blue: #3b82f6;
+        --light-blue: #dbeafe;
+        --accent-blue: #60a5fa;
+        --dark-blue: #1e40af;
+        --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .kelola-kelas-container {
+        background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .header-section {
+        background: var(--gradient-bg);
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(30, 58, 138, 0.2);
+    }
+
+    .header-section h2 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 2.2rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-primary {
+        background: var(--secondary-blue);
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        color: white;
+    }
+
+    .btn-primary::before {
+        content: "➕";
+        margin-right: 8px;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+
+    .table {
+        margin: 0;
+    }
+
+    .table thead th {
+        background: var(--gradient-bg);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border: none;
+        padding: 1rem;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: var(--light-blue);
+        transform: scale(1.005);
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-color: #e2e8f0;
+    }
+
+    .badge {
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .badge.bg-success {
+        background: linear-gradient(45deg, #10b981, #34d399) !important;
+    }
+
+    .badge.bg-secondary {
+        background: linear-gradient(45deg, #6b7280, #9ca3af) !important;
+    }
+
+    .btn-group-actions {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: var(--accent-blue);
+        border: none;
+        color: white !important;
+    }
+
+    .btn-info:hover {
+        background: var(--secondary-blue);
+        transform: translateY(-1px);
+        color: white !important;
+    }
+
+    .btn-warning {
+        background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        border: none;
+        color: white !important;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(45deg, #d97706, #f59e0b);
+        transform: translateY(-1px);
+        color: white !important;
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #ef4444, #f87171);
+        border: none;
+        color: white !important;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(45deg, #dc2626, #ef4444);
+        transform: translateY(-1px);
+        color: white !important;
+    }
+
+    code {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .empty-state {
+        background: white;
+        border-radius: 15px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    .empty-state .alert {
+        border: none;
+        background: linear-gradient(135deg, var(--light-blue), #f8fafc);
+        border-radius: 15px;
+        padding: 2rem;
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--light-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--secondary-blue);
+        font-size: 2rem;
+    }
+
+    .empty-state-icon::before {
+        content: "📚";
+    }
+
+    .empty-state h5 {
+        color: var(--dark-blue);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state a {
+        color: var(--secondary-blue);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .empty-state a:hover {
+        color: var(--primary-blue);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .btn-group-actions {
+            flex-direction: column;
+        }
+        
+        .header-section {
+            padding: 1.5rem;
+        }
+        
+        .header-section h2 {
+            font-size: 1.8rem;
+        }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="kelola-kelas-container">
+    <div class="container fade-in">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="header-section">
+                    <h2>
+                        <div class="header-icon">👨‍🏫</div>
+                        Kelola Kelas
+                    </h2>
+                    <p class="mb-0 opacity-75">Kelola semua kelas dan siswa Anda dengan mudah</p>
+                </div>
+                
+                <div class="mb-3">
+                    <a href="{{ url_for('guru_add_kelas') }}" class="btn btn-primary">Tambah Kelas Baru</a>
+                </div>
+
+                {% if kelas_list %}
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Kelas</th>
+                                        <th>Kode Kelas</th>
+                                        <th>Deskripsi</th>
+                                        <th>Tanggal Dibuat</th>
+                                        <th>Status</th>
+                                        <th>Jumlah Siswa</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for kelas in kelas_list %}
+                                    <tr>
+                                        <td><strong>{{ loop.index }}</strong></td>
+                                        <td><strong>{{ kelas.nama_kelas }}</strong></td>
+                                        <td><code>{{ kelas.kode_kelas }}</code></td>
+                                        <td>{{ kelas.deskripsi or '-' }}</td>
+                                        <td>{{ kelas.tanggal_dibuat.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            {% if kelas.is_active %}
+                                                <span class="badge bg-success">✅ Aktif</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">⏸️ Tidak Aktif</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><strong>{{ kelas.siswas|length }}</strong> siswa</td>
+                                        <td>
+                                            <div class="btn-group-actions">
+                                                <a href="{{ url_for('guru_kelas_siswa', kelas_id=kelas.id) }}" class="btn btn-sm btn-info">👨‍🎓 Kelola Siswa</a>
+                                                <a href="{{ url_for('edit_kelas', kelas_id=kelas.id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
+                                                <a href="{{ url_for('guru_lihat_materi', kelas_id=kelas.id) }}" class="btn btn-sm btn-info">✏️ Kelola Materi</a>
+                                                <a href="{{ url_for('delete_kelas', kelas_id=kelas.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus kelas ini?')">🗑️ Hapus</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="alert alert-info">
+                            <div class="empty-state-icon"></div>
+                            <h5>Belum ada kelas</h5>
+                            <p>Anda belum membuat kelas apapun. <a href="{{ url_for('guru_add_kelas') }}">Buat kelas pertama Anda</a></p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

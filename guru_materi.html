@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Materi - {{ kelas.nama_kelas }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>Materi Pembelajaran</h2>
+                    <p class="text-muted">Kelas: {{ kelas.nama_kelas }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('guru_kelas') }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ url_for('guru_add_materi', kelas_id=kelas.id) }}" class="btn btn-primary">Tambah Materi</a>
+                </div>
+            </div>
+
+            {% if materis %}
+                <div class="row">
+                    {% for materi in materis %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title">{{ materi.judul }}</h6>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Aksi
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{{ url_for('guru_edit_materi', kelas_id=kelas.id, materi_id=materi.id) }}">Edit</a></li>
+                                            <li><a class="dropdown-item" href="{{ url_for('guru_view_materi', kelas_id=kelas.id, materi_id=materi.id) }}">Lihat Detail</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('guru_delete_materi', kelas_id=kelas.id, materi_id=materi.id) }}" style="display: inline;">
+                                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Hapus materi ini?')">Hapus</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <span class="badge bg-primary">{{ materi.mata_pelajaran|title }}</span>
+                                    {% if materi.topik %}
+                                        <span class="badge bg-secondary">{{ materi.topik }}</span>
+                                    {% endif %}
+                                    {% if not materi.is_published %}
+                                        <span class="badge bg-warning">Draft</span>
+                                    {% endif %}
+                                </div>
+
+                                {% if materi.konten %}
+                                    <p class="card-text">{{ materi.konten[:150] }}{% if materi.konten|length > 150 %}...{% endif %}</p>
+                                {% endif %}
+
+                                {% if materi.file_path %}
+                                    <div class="mb-2">
+                                        <i class="bi bi-file-earmark"></i> 
+                                        <small class="text-muted">{{ materi.file_type|upper }} File</small>
+                                        <a href="/uploads/{{ materi.file_path }}" class="btn btn-sm btn-outline-info ms-2" target="_blank">Lihat</a>
+                                    </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ materi.tanggal_dibuat.strftime('%d/%m/%Y %H:%M') }}</small>
+                                    <div>
+                                        {% if materi.is_published %}
+                                            <form method="POST" action="{{ url_for('guru_toggle_materi', kelas_id=kelas.id, materi_id=materi.id) }}" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-warning">Unpublish</button>
+                                            </form>
+                                        {% else %}
+                                            <form method="POST" action="{{ url_for('guru_toggle_materi', kelas_id=kelas.id, materi_id=materi.id) }}" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-success">Publish</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <h5><i class="bi bi-book"></i> Belum Ada Materi</h5>
+                    <p>Anda belum menambahkan materi pembelajaran untuk kelas ini.</p>
+                    <a href="{{ url_for('guru_add_materi', kelas_id=kelas.id) }}" class="btn btn-primary">Tambah Materi Pertama</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Login - E-Learning System{% endblock %}
+
+{% block content %}
+<div>
+    <div>
+        <h2>Login</h2>
+        <p>Masuk ke akun E-Learning Anda</p>
+        
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div>
+                {{ form.username.label() }}
+                {{ form.username(placeholder="Masukkan username") }}
+                {% if form.username.errors %}
+                    <div>
+                        {% for error in form.username.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div>
+                {{ form.password.label() }}
+                {{ form.password(placeholder="Masukkan password") }}
+                {% if form.password.errors %}
+                    <div>
+                        {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div>
+                <button type="submit">Login</button>
+            </div>
+        </form>
+        
+        <div>
+            <h3>Akun Default:</h3>
+            <p><strong>Admin:</strong> admin / admin123</p>
+            <p>Untuk akun guru dan siswa, hubungi administrator</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

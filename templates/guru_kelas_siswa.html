@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block title %}Siswa {{ kelas.nama_kelas }} - E-Learning{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 2.5em;
+        font-weight: 300;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .info-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-left: 4px solid #667eea;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .info-card strong {
+        color: #333;
+        font-size: 1.1em;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .info-card-value {
+        font-size: 1.2em;
+        color: #666;
+    }
+
+    .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+    }
+
+    .alert {
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+        color: white;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .actions-bar {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .bulk-actions {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+
+    .bulk-actions select {
+        padding: 10px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-right: 10px;
+        transition: border-color 0.3s ease;
+    }
+
+    .bulk-actions select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(116, 185, 255, 0.3);
+    }
+
+    .stats-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        display: block;
+    }
+
+    .stats-label {
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .modern-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 18px 15px;
+        text-align: left;
+        font-weight: 600;
+        border: none;
+    }
+
+    .modern-table td {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.3s ease;
+    }
+
+    .modern-table tr:hover td {
+        background-color: #f8f9ff;
+    }
+
+    .modern-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-active {
+        background: #d1f2eb;
+        color: #00b894;
+    }
+
+    .status-inactive {
+        background: #fadbd8;
+        color: #e74c3c;
+    }
+
+    .checkbox-custom {
+        width: 18px;
+        height: 18px;
+        accent-color: #667eea;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: #764ba2;
+    }
+
+    .regenerate-form {
+        display: inline-block;
+        margin-left: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .header {
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+        }
+        
+        .actions-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .modern-table {
+            font-size: 12px;
+        }
+        
+        .modern-table th,
+        .modern-table td {
+            padding: 10px 8px;
+        }
+    }
+</style>
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Kelola Siswa - {{ kelas.nama_kelas }}</h1>
+    </div>
+    
+    <!-- Info Cards -->
+    <div class="info-cards">
+        <div class="info-card">
+            <strong>Kode Kelas</strong>
+            <div class="info-card-value">
+                {{ kelas.kode_kelas }}
+                <form method="POST" action="{{ url_for('guru_regenerate_kelas_code', kelas_id=kelas.id) }}" class="regenerate-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="btn btn-secondary" onclick="return confirm('Regenerate kode kelas?')">
+                        🔄 Regenerate Kode
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <strong>Guru Pengampu</strong>
+            <div class="info-card-value">{{ kelas.guru.nama_lengkap }}</div>
+        </div>
+    </div>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <a href="{{ url_for('guru_add_siswa_to_kelas', kelas_id=kelas.id) }}" class="btn">
+            👥 Tambah Siswa
+        </a>
+        
+        <form method="POST" action="{{ url_for('guru_add_all_siswa_to_kelas', kelas_id=kelas.id) }}" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-success" onclick="return confirm('Tambah semua siswa yang tersedia?')">
+                📥 Tambah Semua Siswa
+            </button>
+        </form>
+
+        
+        <a href="{{ url_for('guru_export_siswa', kelas_id=kelas.id) }}" class="btn btn-secondary">
+            📊 Export ke CSV
+        </a>
+    </div>
+    
+    <!-- Stats Card -->
+    <div class="stats-card">
+        <span class="stats-number">{{ siswa_list|length }}</span>
+        <span class="stats-label">Total Siswa Terdaftar</span>
+    </div>
+    
+    <!-- Bulk Actions Form -->
+    <form method="POST" action="{{ url_for('guru_bulk_manage_siswa', kelas_id=kelas.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="bulk-actions">
+            <select name="action" required>
+                <option value="">-- Pilih Aksi --</option>
+                <option value="remove">🗑️ Keluarkan Siswa Terpilih</option>
+            </select>
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Proses aksi yang dipilih?')">
+                ⚡ Proses
+            </button>
+        </div>
+        
+        <!-- Table -->
+        <div class="table-container">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" class="checkbox-custom"></th>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Nama Lengkap</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for siswa in siswa_list %}
+                    <tr>
+                        <td><input type="checkbox" name="siswa_ids" value="{{ siswa.id }}" class="checkbox-custom"></td>
+                        <td><strong>{{ loop.index }}</strong></td>
+                        <td>{{ siswa.username }}</td>
+                        <td>{{ siswa.nama_lengkap }}</td>
+                        <td>{{ siswa.email }}</td>
+                        <td>
+                            <span class="status-badge {{ 'status-active' if siswa.is_active else 'status-inactive' }}">
+                                {{ 'Aktif' if siswa.is_active else 'Nonaktif' }}
+                            </span>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('guru_remove_siswa_from_kelas', kelas_id=kelas.id, siswa_id=siswa.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Keluarkan siswa {{ siswa.nama_lengkap }}?')" style="font-size: 12px; padding: 6px 12px;">
+                                    🗑️ Keluarkan
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            📚 Belum ada siswa di kelas ini
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+    
+    <!-- Back Link -->
+    <div style="margin-top: 30px;">
+        <a href="{{ url_for('guru_kelas') }}" class="back-link">
+            ← Kembali ke Daftar Kelas
+        </a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('select-all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="siswa_ids"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    
+    // Add smooth transitions for buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+
+{% endblock %}

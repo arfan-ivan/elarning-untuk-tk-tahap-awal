@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola User - E-Learning{% endblock %}
+
+{% block content %}
+<h1>Kelola User</h1>
+
+<div>
+    <a href="{{ url_for('admin_add_user') }}">
+        <button>Tambah User Baru</button>
+    </a>
+</div>
+
+<div>
+    <h2>Daftar User</h2>
+    {% if users %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Nama Lengkap</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Tanggal Daftar</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.nama_lengkap }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role.title() }}</td>
+                <td>{{ user.tanggal_daftar.strftime('%d/%m/%Y') }}</td>
+                <td>{{ 'Aktif' if user.is_active else 'Tidak Aktif' }}</td>
+                <td>{{ user.last_login.strftime('%d/%m/%Y %H:%M') if user.last_login else 'Belum pernah' }}</td>
+                <td>
+                    <a href="{{ url_for('admin_edit_user', user_id=user.id) }}">
+                        <button>Edit</button>
+                    </a>
+                    
+                    <a href="{{ url_for('admin_reset_password', user_id=user.id) }}">
+                        <button onclick="return confirm('Reset password untuk {{ user.nama_lengkap }}?')">Reset Password</button>
+                    </a>
+                    
+                    <a href="{{ url_for('admin_toggle_user', user_id=user.id) }}">
+                        <button onclick="return confirm('{{ 'Nonaktifkan' if user.is_active else 'Aktifkan' }} user {{ user.nama_lengkap }}?')">
+                            {{ 'Nonaktifkan' if user.is_active else 'Aktifkan' }}
+                        </button>
+                    </a>
+                    
+                    {% if user.role != 'admin' %}
+                    <button onclick="confirmDelete('{{ user.id }}', '{{ user.nama_lengkap }}', '{{ user.username }}', '{{ user.role }}')" 
+                            style="background-color: #dc3545; color: white; border: 1px solid #dc3545; cursor: pointer;">
+                        Hapus
+                    </button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Belum ada user yang terdaftar.</p>
+    {% endif %}
+</div>
+
+<!-- Form tersembunyi untuk delete -->
+<form id="deleteForm" method="POST" style="display: none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+</form>
+
+<script>
+function confirmDelete(userId, namaLengkap, username, role) {
+    // Konfirmasi pertama
+    if (!confirm('⚠️ PERINGATAN!\n\nAnda akan menghapus user:\n\n' +
+                 '👤 Nama: ' + namaLengkap + '\n' +
+                 '🔑 Username: ' + username + '\n' +
+                 '📋 Role: ' + role + '\n\n' +
+                 'Tindakan ini akan menghapus SEMUA data terkait user ini:\n' +
+                 '• Akun user\n' +
+                 '• Submissions tugas\n' +
+                 '• Riwayat quiz\n' +
+                 '• Post forum\n' +
+                 '• Data absensi\n' +
+                 '• Notifikasi\n' +
+                 (role === 'guru' ? '• Kelas yang diajar akan dinonaktifkan\n' : '') +
+                 '\n❌ TINDAKAN INI TIDAK DAPAT DIBATALKAN!\n\n' +
+                 'Apakah Anda yakin ingin melanjutkan?')) {
+        return false;
+    }
+    
+    // Konfirmasi kedua (double confirmation)
+    if (!confirm('🚨 KONFIRMASI TERAKHIR!\n\n' +
+                 'Anda benar-benar yakin ingin menghapus user "' + namaLengkap + '"?\n\n' +
+                 'Ketik "HAPUS" di prompt berikutnya untuk melanjutkan, atau Cancel untuk membatalkan.')) {
+        return false;
+    }
+    
+    // Prompt untuk mengetik "HAPUS"
+    var confirmText = prompt('Untuk mengkonfirmasi penghapusan, ketik "HAPUS" (huruf besar semua):');
+    
+    if (confirmText !== 'HAPUS') {
+        alert('❌ Penghapusan dibatalkan.\n\nTeks konfirmasi tidak sesuai atau Anda memilih untuk membatalkan.');
+        return false;
+    }
+    
+    // Jika semua konfirmasi passed, lakukan penghapusan
+    var form = document.getElementById('deleteForm');
+    form.action = '/admin/delete_user/' + userId;
+    
+    // Show loading alert
+    alert('⏳ Sedang menghapus user...\n\nHarap tunggu, jangan refresh halaman.');
+    
+    form.submit();
+}
+
+// Fungsi untuk mencegah multiple clicks
+document.addEventListener('DOMContentLoaded', function() {
+    var deleteButtons = document.querySelectorAll('button[onclick*="confirmDelete"]');
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            // Disable button temporarily to prevent multiple clicks
+            this.disabled = true;
+            var self = this;
+            setTimeout(function() {
+                self.disabled = false;
+            }, 2000);
+        });
+    });
+});
+
+// Fungsi untuk menampilkan loading state
+function showLoading() {
+    document.body.style.cursor = 'wait';
+    var buttons = document.querySelectorAll('button');
+    buttons.forEach(function(btn) {
+        btn.disabled = true;
+    });
+}
+
+// Event listener untuk form submit
+document.getElementById('deleteForm').addEventListener('submit', function() {
+    showLoading();
+});
+</script>
+
+<style>
+/* Styling untuk tombol hapus */
+button[onclick*="confirmDelete"] {
+    padding: 5px 10px;
+    margin: 2px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+button[onclick*="confirmDelete"]:hover {
+    background-color: #c82333 !important;
+    transform: scale(1.05);
+}
+
+button[onclick*="confirmDelete"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Loading cursor untuk body */
+body.loading {
+    cursor: wait;
+}
+
+/* Styling untuk aksi buttons */
+td button {
+    margin: 2px;
+    padding: 5px 8px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+td button:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+</style>
+{% endblock %}

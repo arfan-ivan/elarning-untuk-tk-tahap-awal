@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Edit Kelas</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    
+    <div class="form-group">
+        {{ form.nama_kelas.label }}<br>
+        {{ form.nama_kelas(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.deskripsi.label }}<br>
+        {{ form.deskripsi(class="form-control") }}
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    <a href="{{ url_for('guru_kelas') }}" class="btn btn-secondary">Batal</a>
+</form>
+{% endblock %}

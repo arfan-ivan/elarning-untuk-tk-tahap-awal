@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Kelas - E-Learning{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Kelola Kelas</h2>
+            
+            <div class="mb-3">
+                <a href="{{ url_for('guru_add_kelas') }}" class="btn btn-primary">Tambah Kelas Baru</a>
+            </div>
+
+            {% if kelas_list %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Kelas</th>
+                                <th>Kode Kelas</th>
+                                <th>Deskripsi</th>
+                                <th>Tanggal Dibuat</th>
+                                <th>Status</th>
+                                <th>Jumlah Siswa</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kelas in kelas_list %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ kelas.nama_kelas }}</td>
+                                <td><code>{{ kelas.kode_kelas }}</code></td>
+                                <td>{{ kelas.deskripsi or '-' }}</td>
+                                <td>{{ kelas.tanggal_dibuat.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if kelas.is_active %}
+                                        <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Tidak Aktif</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ kelas.siswas|length }} siswa</td>
+                                <td>
+                                    <a href="{{ url_for('guru_kelas_siswa', kelas_id=kelas.id) }}" class="btn btn-sm btn-info">Kelola Siswa</a>
+                                    <a href="{{ url_for('edit_kelas', kelas_id=kelas.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{{ url_for('delete_kelas', kelas_id=kelas.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus kelas ini?')">Hapus</a>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <h5>Belum ada kelas</h5>
+                    <p>Anda belum membuat kelas apapun. <a href="{{ url_for('guru_add_kelas') }}">Buat kelas pertama Anda</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

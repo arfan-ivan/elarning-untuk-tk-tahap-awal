@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Tugas - {{ kelas.nama_kelas }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>Tugas & Penilaian</h2>
+                    <p class="text-muted">Kelas: {{ kelas.nama_kelas }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('guru_kelas') }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ url_for('guru_add_tugas', kelas_id=kelas.id) }}" class="btn btn-primary">Buat Tugas Baru</a>
+                </div>
+            </div>
+
+            {% if tugas_list %}
+                <div class="row">
+                    {% for tugas in tugas_list %}
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">{{ tugas.judul }}</h5>
+                                        <p class="card-text">{{ tugas.deskripsi[:200] }}{% if tugas.deskripsi|length > 200 %}...{% endif %}</p>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar"></i> Dibuat: {{ tugas.tanggal_dibuat.strftime('%d/%m/%Y %H:%M') }}<br>
+                                                    <i class="bi bi-clock"></i> Deadline: {{ tugas.deadline.strftime('%d/%m/%Y %H:%M') }}
+                                                    {% if tugas.deadline < moment().utcnow() %}
+                                                        <span class="badge bg-danger ms-1">Berakhir</span>
+                                                    {% elif (tugas.deadline - moment().utcnow()).days <= 1 %}
+                                                        <span class="badge bg-warning ms-1">Segera Berakhir</span>
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-file"></i> Max File: {{ tugas.max_file_size }}MB<br>
+                                                    <i class="bi bi-filetype-doc"></i> Format: {{ tugas.allowed_extensions }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="text-end">
+                                            {% set total_siswa = kelas.siswas|length %}
+                                            {% set submitted = tugas.submissions|length %}
+                                            {% set graded = tugas.submissions|selectattr('nilai')|list|length %}
+                                            
+                                            <div class="mb-2">
+                                                <h6>Status Pengumpulan</h6>
+                                                <div class="progress mb-1" style="height: 20px;">
+                                                    {% set submit_percent = (submitted / total_siswa * 100) if total_siswa > 0 else 0 %}
+                                                    <div class="progress-bar" style="width: {{ submit_percent }}%">
+                                                        {{ submitted }}/{{ total_siswa }}
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">{{ submitted }} dari {{ total_siswa }} siswa mengumpulkan</small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <small class="text-muted">{{ graded }} sudah dinilai</small>
+                                            </div>
+                                            
+                                            <div class="btn-group-vertical w-100">
+                                                <a href="{{ url_for('guru_view_submissions', kelas_id=kelas.id, tugas_id=tugas.id) }}" class="btn btn-sm btn-primary">
+                                                    Lihat Pengumpulan ({{ submitted }})
+                                                </a>
+                                                <a href="{{ url_for('guru_edit_tugas', kelas_id=kelas.id, tugas_id=tugas.id) }}" class="btn btn-sm btn-outline-secondary">
+                                                    Edit Tugas
+                                                </a>
+                                                {% if tugas.is_active %}
+                                                    <form method="POST" action="{{ url_for('guru_toggle_tugas', kelas_id=kelas.id, tugas_id=tugas.id) }}" style="display: inline;">
+                                                        <button type="submit" class="btn btn-sm btn-warning w-100">Nonaktifkan</button>
+                                                    </form>
+                                                {% else %}
+                                                    <form method="POST" action="{{ url_for('guru_toggle_tugas', kelas_id=kelas.id, tugas_id=tugas.id) }}" style="display: inline;">
+                                                        <button type="submit" class="btn btn-sm btn-success w-100">Aktifkan</button>
+                                                    </form>
+                                                {% endif %}
+                                                <form method="POST" action="{{ url_for('guru_delete_tugas', kelas_id=kelas.id, tugas_id=tugas.id) }}" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-danger w-100" onclick="return confirm('Hapus tugas ini? Semua pengumpulan akan terhapus!')">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <h5><i class="bi bi-clipboard-check"></i> Belum Ada Tugas</h5>
+                    <p>Anda belum membuat tugas untuk kelas ini.</p>
+                    <a href="{{ url_for('guru_add_tugas', kelas_id=kelas.id) }}" class="btn btn-primary">Buat Tugas Pertama</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

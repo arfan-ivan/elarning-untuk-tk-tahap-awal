@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ kelas.nama_kelas }} - Detail Kelas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ kelas.nama_kelas }}</h2>
+                <div>
+                    <a href="{{ url_for('siswa_my_kelas') }}" class="btn btn-secondary">Kembali</a>
+                    <form method="POST" action="{{ url_for('siswa_leave_kelas', kelas_id=kelas.id) }}" style="display: inline;" 
+                          onsubmit="return confirm('Apakah Anda yakin ingin keluar dari kelas ini?')">
+                        <button type="submit" class="btn btn-danger">Keluar dari Kelas</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informasi Kelas</h5>
+                    <p class="card-text">{{ kelas.deskripsi or 'Tidak ada deskripsi' }}</p>
+                    <p><strong>Guru:</strong> {{ kelas.guru.nama_lengkap }}</p>
+                    <p><strong>Kode Kelas:</strong> <code>{{ kelas.kode_kelas }}</code></p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs" id="kelasTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="materi-tab" data-bs-toggle="tab" data-bs-target="#materi" type="button" role="tab">
+                        Materi ({{ materis|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tugas-tab" data-bs-toggle="tab" data-bs-target="#tugas" type="button" role="tab">
+                        Tugas ({{ tugas_list|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="quiz-tab" data-bs-toggle="tab" data-bs-target="#quiz" type="button" role="tab">
+                        Quiz ({{ quiz_list|length }})
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="kelasTabContent">
+                <!-- Tab Materi -->
+                <div class="tab-pane fade show active" id="materi" role="tabpanel">
+                    <div class="mt-3">
+                        {% if materis %}
+                            <div class="row">
+                                {% for materi in materis %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ materi.judul }}</h6>
+                                            <p class="card-text">
+                                                <small class="text-muted">{{ materi.mata_pelajaran|title }}</small>
+                                                {% if materi.topik %}
+                                                    | {{ materi.topik }}
+                                                {% endif %}
+                                            </p>
+                                            {% if materi.konten %}
+                                                <p class="card-text">{{ materi.konten[:100] }}{% if materi.konten|length > 100 %}...{% endif %}</p>
+                                            {% endif %}
+                                            {% if materi.file_path %}
+                                                <p><i class="bi bi-file-earmark"></i> File: {{ materi.file_type|upper }}</p>
+                                                <a href="/uploads/{{ materi.file_path }}" class="btn btn-sm btn-outline-primary" target="_blank">Lihat File</a>
+                                            {% endif %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">{{ materi.tanggal_dibuat.strftime('%d/%m/%Y %H:%M') }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle"></i> Belum ada materi yang tersedia.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Tab Tugas -->
+                <div class="tab-pane fade" id="tugas" role="tabpanel">
+                    <div class="mt-3">
+                        {% if tugas_list %}
+                            <div class="row">
+                                {% for tugas in tugas_list %}
+                                <div class="col-md-12 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">{{ tugas.judul }}</h6>
+                                                    <p class="card-text">{{ tugas.deskripsi }}</p>
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            Deadline: {{ tugas.deadline.strftime('%d/%m/%Y %H:%M') }}
+                                                            {% if tugas.deadline < moment().utcnow() %}
+                                                                <span class="badge bg-danger">Terlambat</span>
+                                                            {% elif (tugas.deadline - moment().utcnow()).days <= 1 %}
+                                                                <span class="badge bg-warning">Segera Berakhir</span>
+                                                            {% endif %}
+                                                        </small>
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    {% set submission = tugas.submissions|selectattr('siswa_id', 'equalto', current_user.id)|first %}
+                                                    {% if submission %}
+                                                        {% if submission.status == 'graded' %}
+                                                            <span class="badge bg-success">Dinilai ({{ submission.nilai }})</span>
+                                                        {% else %}
+                                                            <span class="badge bg-info">Sudah Dikumpulkan</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <a href="#" class="btn btn-sm btn-primary">Kerjakan Tugas</a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle"></i> Belum ada tugas yang tersedia.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Tab Quiz -->
+                <div class="tab-pane fade" id="quiz" role="tabpanel">
+                    <div class="mt-3">
+                        {% if quiz_list %}
+                            <div class="row">
+                                {% for quiz in quiz_list %}
+                                <div class="col-md-12 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">{{ quiz.judul }}</h6>
+                                                    {% if quiz.deskripsi %}
+                                                        <p class="card-text">{{ quiz.deskripsi }}</p>
+                                                    {% endif %}
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            Mulai: {{ quiz.tanggal_mulai.strftime('%d/%m/%Y %H:%M') }}<br>
+                                                            Selesai: {{ quiz.tanggal_selesai.strftime('%d/%m/%Y %H:%M') }}<br>
+                                                            Durasi: {{ quiz.durasi_menit }} menit
+                                                        </small>
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    {% set attempt = quiz.attempts|selectattr('siswa_id', 'equalto', current_user.id)|first %}
+                                                    {% if attempt %}
+                                                        {% if attempt.status == 'completed' %}
+                                                            <span class="badge bg-success">Selesai ({{ attempt.skor }})</span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning">Sedang Dikerjakan</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if quiz.tanggal_mulai <= moment().utcnow() <= quiz.tanggal_selesai %}
+                                                            <a href="#" class="btn btn-sm btn-primary">Mulai Quiz</a>
+                                                        {% elif quiz.tanggal_mulai > moment().utcnow() %}
+                                                            <span class="badge bg-secondary">Belum Dimulai</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">Sudah Berakhir</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle"></i> Belum ada quiz yang tersedia.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

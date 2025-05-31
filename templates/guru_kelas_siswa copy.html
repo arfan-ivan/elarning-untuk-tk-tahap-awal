@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Siswa {{ kelas.nama_kelas }} - E-Learning{% endblock %}
+
+{% block content %}
+<h1>Daftar Siswa - {{ kelas.nama_kelas }}</h1>
+
+<div>
+    <h3>Informasi Kelas</h3>
+    <ul>
+        <li><strong>Nama Kelas:</strong> {{ kelas.nama_kelas }}</li>
+        <li><strong>Kode Kelas:</strong> {{ kelas.kode_kelas }}</li>
+        <li><strong>Deskripsi:</strong> {{ kelas.deskripsi or '-' }}</li>
+        <li><strong>Guru:</strong> {{ kelas.guru.nama_lengkap }}</li>
+        <li><strong>Total Siswa:</strong> {{ siswa_list|length }}</li>
+    </ul>
+</div>
+
+<div>
+    <h3>Daftar Siswa</h3>
+    {% if siswa_list %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Lengkap</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Tanggal Bergabung</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for siswa in siswa_list %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ siswa.nama_lengkap }}</td>
+                <td>{{ siswa.username }}</td>
+                <td>{{ siswa.email }}</td>
+                <td>
+                    {% for kelas_siswa in siswa.kelas_siswa %}
+                        {% if kelas_siswa.kelas_id == kelas.id %}
+                            {{ kelas_siswa.tanggal_bergabung.strftime('%d/%m/%Y') }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ 'Aktif' if siswa.is_active else 'Tidak Aktif' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Belum ada siswa yang bergabung di kelas ini.</p>
+    <p><strong>Kode Kelas:</strong> {{ kelas.kode_kelas }} (bagikan kepada siswa untuk bergabung)</p>
+    {% endif %}
+</div>
+
+<div>
+    <a href="{{ url_for('guru_kelas') }}">
+        <button>Kembali ke Daftar Kelas</button>
+    </a>
+</div>
+{% endblock %}

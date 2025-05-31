@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Kelas Saya - E-Learning{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Kelas Saya</h2>
+            
+            <div class="mb-3">
+                <a href="{{ url_for('siswa_join_kelas') }}" class="btn btn-primary">Bergabung ke Kelas Baru</a>
+            </div>
+
+            {% if kelas_list %}
+                <div class="row">
+                    {% for kelas in kelas_list %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">{{ kelas.nama_kelas }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <strong>Guru:</strong> {{ kelas.guru.nama_lengkap }}<br>
+                                    <strong>Kode:</strong> <code>{{ kelas.kode_kelas }}</code><br>
+                                    <strong>Deskripsi:</strong> {{ kelas.deskripsi or '-' }}<br>
+                                    <strong>Siswa:</strong> {{ kelas.siswas|length }} siswa
+                                </p>
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('siswa_view_kelas', kelas_id=kelas.id) }}" class="btn btn-primary">
+                                        Masuk ke Kelas
+                                    </a>
+                                    <form method="POST" action="{{ url_for('siswa_leave_kelas', kelas_id=kelas.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100" 
+                                                onclick="return confirm('Yakin ingin keluar dari kelas {{ kelas.nama_kelas }}?')">
+                                            Keluar dari Kelas
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                {% for kelas_siswa in current_user.kelas_siswa %}
+                                    {% if kelas_siswa.kelas_id == kelas.id %}
+                                        Bergabung: {{ kelas_siswa.tanggal_bergabung.strftime('%d/%m/%Y') }}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <h5>Belum bergabung ke kelas apapun</h5>
+                    <p>Anda belum bergabung ke kelas manapun. Dapatkan kode kelas dari guru Anda dan bergabung sekarang!</p>
+                    <a href="{{ url_for('siswa_join_kelas') }}" class="btn btn-primary">Bergabung ke Kelas</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

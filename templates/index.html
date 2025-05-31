@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Selamat Datang - E-Learning System{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Selamat Datang di E-Learning System</h1>
+    <p>Platform pembelajaran online yang memudahkan interaksi antara guru dan siswa.</p>
+    
+    <section>
+        <h2>Fitur Utama</h2>
+        <div>
+            <div>
+                <h3>Untuk Guru</h3>
+                <ul>
+                    <li>Membuat dan mengelola kelas</li>
+                    <li>Upload materi pembelajaran</li>
+                    <li>Membuat tugas dan quiz</li>
+                    <li>Menilai tugas siswa</li>
+                    <li>Forum diskusi</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Untuk Siswa</h3>
+                <ul>
+                    <li>Bergabung kelas dengan kode</li>
+                    <li>Mengakses materi pembelajaran</li>
+                    <li>Mengerjakan tugas dan quiz</li>
+                    <li>Melihat nilai dan feedback</li>
+                    <li>Berpartisipasi dalam forum</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Untuk Admin</h3>
+                <ul>
+                    <li>Mengelola user sistem</li>
+                    <li>Monitoring aktivitas</li>
+                    <li>Konfigurasi sistem</li>
+                    <li>Laporan dan statistik</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <div>
+        <h2>Mulai Belajar Sekarang</h2>
+        <p>Sudah memiliki akun? <a href="{{ url_for('login') }}">Login di sini</a></p>
+        <p>Belum memiliki akun? Hubungi administrator untuk mendaftar.</p>
+    </div>
+</div>
+{% endblock %}

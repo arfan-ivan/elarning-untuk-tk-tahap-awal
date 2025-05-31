@@ -1,0 +1,626 @@
+<!-- ============ HALAMAN 1: DAFTAR KELAS GURU (guru_kelas.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Kelas - Guru</title>
+</head>
+<body>
+    <h1>Daftar Kelas</h1>
+    
+    <div>
+        <a href="{{ url_for('guru_add_kelas') }}">Tambah Kelas Baru</a>
+    </div>
+    <br>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Kelas</th>
+                <th>Kode Kelas</th>
+                <th>Deskripsi</th>
+                <th>Jumlah Siswa</th>
+                <th>Status</th>
+                <th>Tanggal Dibuat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for kelas in kelas_list %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ kelas.nama_kelas }}</td>
+                <td>{{ kelas.kode_kelas }}</td>
+                <td>{{ kelas.deskripsi or '-' }}</td>
+                <td>{{ kelas.siswa|length }}</td>
+                <td>{{ 'Aktif' if kelas.is_active else 'Nonaktif' }}</td>
+                <td>{{ kelas.tanggal_dibuat.strftime('%d/%m/%Y') if kelas.tanggal_dibuat else '-' }}</td>
+                <td>
+                    <a href="{{ url_for('guru_kelas_siswa', kelas_id=kelas.id) }}">Kelola Siswa</a> |
+                    <a href="{{ url_for('guru_lihat_materi', kelas_id=kelas.id) }}">Materi</a> |
+                    <a href="{{ url_for('edit_kelas', kelas_id=kelas.id) }}">Edit</a> |
+                    <a href="{{ url_for('delete_kelas', kelas_id=kelas.id) }}" onclick="return confirm('Yakin hapus kelas ini?')">Hapus</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">Belum ada kelas yang dibuat.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+
+<!-- ============ HALAMAN 2: TAMBAH KELAS (guru_add_kelas.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Kelas Baru</title>
+</head>
+<body>
+    <h1>Tambah Kelas Baru</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div>
+            {{ form.nama_kelas.label }}<br>
+            {{ form.nama_kelas(size=50) }}
+            {% if form.nama_kelas.errors %}
+                <ul>
+                {% for error in form.nama_kelas.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.deskripsi.label }}<br>
+            {{ form.deskripsi(rows=4, cols=50) }}
+            {% if form.deskripsi.errors %}
+                <ul>
+                {% for error in form.deskripsi.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.submit() }}
+            <a href="{{ url_for('guru_kelas') }}">Batal</a>
+        </div>
+    </form>
+</body>
+</html>
+
+<!-- ============ HALAMAN 3: EDIT KELAS (guru_edit_kelas.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Kelas</title>
+</head>
+<body>
+    <h1>Edit Kelas - {{ kelas.nama_kelas }}</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div>
+            {{ form.nama_kelas.label }}<br>
+            {{ form.nama_kelas(size=50) }}
+            {% if form.nama_kelas.errors %}
+                <ul>
+                {% for error in form.nama_kelas.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.deskripsi.label }}<br>
+            {{ form.deskripsi(rows=4, cols=50) }}
+            {% if form.deskripsi.errors %}
+                <ul>
+                {% for error in form.deskripsi.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            <strong>Kode Kelas:</strong> {{ kelas.kode_kelas }}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.submit() }}
+            <a href="{{ url_for('guru_kelas') }}">Batal</a>
+        </div>
+    </form>
+</body>
+</html>
+
+<!-- ============ HALAMAN 4: KELOLA SISWA KELAS (guru_kelas_siswa.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Siswa - {{ kelas.nama_kelas }}</title>
+</head>
+<body>
+    <h1>Kelola Siswa - {{ kelas.nama_kelas }}</h1>
+    
+    <div>
+        <strong>Kode Kelas:</strong> {{ kelas.kode_kelas }}
+        <form method="POST" action="{{ url_for('guru_regenerate_kelas_code', kelas_id=kelas.id) }}" style="display: inline;">
+            <input type="submit" value="Regenerate Kode" onclick="return confirm('Regenerate kode kelas?')">
+        </form>
+    </div>
+    <br>
+    
+    <div>
+        <strong>Guru:</strong> {{ kelas.guru.nama_lengkap }}
+    </div>
+    <br>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div>
+        <a href="{{ url_for('guru_add_siswa_to_kelas', kelas_id=kelas.id) }}">Tambah Siswa</a> |
+        <form method="POST" action="{{ url_for('guru_add_all_siswa_to_kelas', kelas_id=kelas.id) }}" style="display: inline;">
+            <input type="submit" value="Tambah Semua Siswa" onclick="return confirm('Tambah semua siswa yang tersedia?')">
+        </form> |
+        <a href="{{ url_for('guru_export_siswa', kelas_id=kelas.id) }}">Export ke CSV</a>
+    </div>
+    <br>
+    
+    <form method="POST" action="{{ url_for('guru_bulk_manage_siswa', kelas_id=kelas.id) }}">
+        <div>
+            <select name="action">
+                <option value="">-- Pilih Aksi --</option>
+                <option value="remove">Keluarkan Siswa Terpilih</option>
+            </select>
+            <input type="submit" value="Proses" onclick="return confirm('Proses aksi yang dipilih?')">
+        </div>
+        <br>
+        
+        <div>
+            <strong>Total Siswa:</strong> {{ siswa_list|length }}
+        </div>
+        <br>
+        
+        <table border="1">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all"></th>
+                    <th>No</th>
+                    <th>Username</th>
+                    <th>Nama Lengkap</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for siswa in siswa_list %}
+                <tr>
+                    <td><input type="checkbox" name="siswa_ids" value="{{ siswa.id }}"></td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ siswa.username }}</td>
+                    <td>{{ siswa.nama_lengkap }}</td>
+                    <td>{{ siswa.email }}</td>
+                    <td>{{ 'Aktif' if siswa.is_active else 'Nonaktif' }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('guru_remove_siswa_from_kelas', kelas_id=kelas.id, siswa_id=siswa.id) }}" style="display: inline;">
+                            <input type="submit" value="Keluarkan" onclick="return confirm('Keluarkan siswa {{ siswa.nama_lengkap }}?')">
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">Belum ada siswa di kelas ini.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+    
+    <br>
+    <div>
+        <a href="{{ url_for('guru_kelas') }}">Kembali ke Daftar Kelas</a>
+    </div>
+
+    <script>
+        document.getElementById('select-all').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[name="siswa_ids"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    </script>
+</body>
+</html>
+
+<!-- ============ HALAMAN 5: TAMBAH SISWA KE KELAS (guru_add_siswa.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Siswa ke Kelas</title>
+</head>
+<body>
+    <h1>Tambah Siswa ke Kelas - {{ kelas.nama_kelas }}</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST">
+        <div>
+            <label for="siswa_id">Pilih Siswa:</label><br>
+            <select id="siswa_id" name="siswa_id" required>
+                <option value="">-- Pilih Siswa --</option>
+                {% for siswa in siswa_available %}
+                <option value="{{ siswa.id }}">{{ siswa.nama_lengkap }} ({{ siswa.username }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        
+        <div>
+            <input type="submit" value="Tambah Siswa">
+            <a href="{{ url_for('guru_kelas_siswa', kelas_id=kelas.id) }}">Batal</a>
+        </div>
+    </form>
+    
+    <br>
+    <h3>Siswa yang Tersedia ({{ siswa_available|length }} siswa)</h3>
+    {% if siswa_available %}
+    <ul>
+        {% for siswa in siswa_available %}
+        <li>{{ siswa.nama_lengkap }} ({{ siswa.username }}) - {{ siswa.email }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Tidak ada siswa yang tersedia untuk ditambahkan.</p>
+    {% endif %}
+</body>
+</html>
+
+<!-- ============ HALAMAN 6: DAFTAR MATERI KELAS (guru_lihat_materi.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi Kelas - {{ kelas.nama_kelas }}</title>
+</head>
+<body>
+    <h1>Materi Kelas - {{ kelas.nama_kelas }}</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div>
+        <a href="{{ url_for('guru_tambah_materi', kelas_id=kelas.id) }}">Tambah Materi Baru</a>
+    </div>
+    <br>
+    
+    <div>
+        <strong>Total Materi:</strong> {{ materis|length }}
+    </div>
+    <br>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Judul</th>
+                <th>Mata Pelajaran</th>
+                <th>Topik</th>
+                <th>File</th>
+                <th>Urutan</th>
+                <th>Tanggal Dibuat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for materi in materis %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ materi.judul }}</td>
+                <td>{{ materi.mata_pelajaran }}</td>
+                <td>{{ materi.topik or '-' }}</td>
+                <td>
+                    {% if materi.file_path %}
+                        <a href="{{ url_for('uploaded_file', filename=materi.file_path) }}">{{ materi.file_path }}</a>
+                        <br><small>({{ materi.file_type.upper() if materi.file_type else 'File' }})</small>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ materi.urutan or '-' }}</td>
+                <td>{{ materi.tanggal_dibuat.strftime('%d/%m/%Y %H:%M') if materi.tanggal_dibuat else '-' }}</td>
+                <td>
+                    <a href="{{ url_for('guru_edit_materi', kelas_id=kelas.id, materi_id=materi.id) }}">Edit</a> |
+                    <form method="POST" action="{{ url_for('guru_delete_materi', kelas_id=kelas.id, materi_id=materi.id) }}" style="display: inline;">
+                        <input type="submit" value="Hapus" onclick="return confirm('Hapus materi {{ materi.judul }}?')">
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">Belum ada materi di kelas ini.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <br>
+    <div>
+        <a href="{{ url_for('guru_kelas') }}">Kembali ke Daftar Kelas</a>
+    </div>
+</body>
+</html>
+
+<!-- ============ HALAMAN 7: TAMBAH MATERI (guru_tambah_materi.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Materi - {{ kelas.nama_kelas }}</title>
+</head>
+<body>
+    <h1>Tambah Materi - {{ kelas.nama_kelas }}</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div>
+            {{ form.judul.label }}<br>
+            {{ form.judul(size=60) }}
+            {% if form.judul.errors %}
+                <ul>
+                {% for error in form.judul.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.mata_pelajaran.label }}<br>
+            {{ form.mata_pelajaran(size=40) }}
+            {% if form.mata_pelajaran.errors %}
+                <ul>
+                {% for error in form.mata_pelajaran.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.topik.label }}<br>
+            {{ form.topik(size=40) }}
+            {% if form.topik.errors %}
+                <ul>
+                {% for error in form.topik.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.konten.label }}<br>
+            {{ form.konten(rows=10, cols=80) }}
+            {% if form.konten.errors %}
+                <ul>
+                {% for error in form.konten.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.file.label }}<br>
+            {{ form.file() }}
+            {% if form.file.errors %}
+                <ul>
+                {% for error in form.file.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <br><small>Format yang didukung: PDF, DOC, DOCX, PPT, PPTX, TXT</small>
+        </div>
+        <br>
+        
+        <div>
+            {{ form.submit() }}
+            <a href="{{ url_for('guru_lihat_materi', kelas_id=kelas.id) }}">Batal</a>
+        </div>
+    </form>
+</body>
+</html>
+
+<!-- ============ HALAMAN 8: EDIT MATERI (guru_edit_materi.html) ============ -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Materi - {{ materi.judul }}</title>
+</head>
+<body>
+    <h1>Edit Materi - {{ materi.judul }}</h1>
+    
+    <div>
+        <strong>Kelas:</strong> {{ kelas.nama_kelas }}
+    </div>
+    <br>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div>
+            {{ form.judul.label }}<br>
+            {{ form.judul(size=60) }}
+            {% if form.judul.errors %}
+                <ul>
+                {% for error in form.judul.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.mata_pelajaran.label }}<br>
+            {{ form.mata_pelajaran(size=40) }}
+            {% if form.mata_pelajaran.errors %}
+                <ul>
+                {% for error in form.mata_pelajaran.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.topik.label }}<br>
+            {{ form.topik(size=40) }}
+            {% if form.topik.errors %}
+                <ul>
+                {% for error in form.topik.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        <div>
+            {{ form.konten.label }}<br>
+            {{ form.konten(rows=10, cols=80) }}
+            {% if form.konten.errors %}
+                <ul>
+                {% for error in form.konten.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <br>
+        
+        {% if materi.file_path %}
+        <div>
+            <label>File saat ini:</label><br>
+            <a href="{{ url_for('uploaded_file', filename=materi.file_path) }}">{{ materi.file_path }}</a>
+            <small>({{ materi.file_type.upper() if materi.file_type else 'File' }})</small>
+        </div>
+        <br>
+        {% endif %}
+        
+        <div>
+            {{ form.file.label }}<br>
+            {{ form.file() }}
+            {% if form.file.errors %}
+                <ul>
+                {% for error in form.file.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <br><small>{% if materi.file_path %}Kosongkan jika tidak ingin mengubah file{% else %}Upload file baru (opsional){% endif %}</small>
+        </div>
+        <br>
+        
+        <div>
+            {{ form.submit() }}
+            <a href="{{ url_for('guru_lihat_materi', kelas_id=kelas.id) }}">Batal</a>
+        </div>
+    </form>
+</body>
+</html>

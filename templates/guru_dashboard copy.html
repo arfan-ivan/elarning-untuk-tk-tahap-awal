@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Guru - E-Learning System{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Dashboard Guru</h1>
+    <p>Selamat datang, {{ current_user.nama_lengkap }}!</p>
+    
+    <div>
+        <h2>Ringkasan</h2>
+        <div>
+            <div>
+                <h3>{{ kelas_mengajar|length }}</h3>
+                <p>Kelas yang Diampu</p>
+            </div>
+            <div>
+                <h3>{{ total_siswa }}</h3>
+                <p>Total Siswa</p>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <h2>Kelas yang Diampu</h2>
+        {% if kelas_mengajar %}
+            <div>
+                {% for kelas in kelas_mengajar %}
+                <div>
+                    <h3>{{ kelas.nama_kelas }}</h3>
+                    <p>{{ kelas.deskripsi or 'Tidak ada deskripsi' }}</p>
+                    <p><strong>Kode Kelas:</strong> {{ kelas.kode_kelas }}</p>
+                    <p><strong>Jumlah Siswa:</strong> {{ kelas.siswas|length }}</p>
+                    <p><strong>Dibuat:</strong> {{ kelas.tanggal_dibuat.strftime('%d/%m/%Y') }}</p>
+                    
+                    <div>
+                        <a href="{{ url_for('guru_kelas_siswa', kelas_id=kelas.id) }}">Kelola Siswa</a>
+                        <a href="{{ url_for('guru_kelas') }}">Kelola Kelas</a>
+                        <a href="{{ url_for('guru_tambah_materi', kelas_id=kelas.id) }}">Kelola Materi</a>
+                        <a href="#">Kelola Tugas</a>
+                        <a href="#">Kelola Quiz</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Anda belum memiliki kelas. <a href="{{ url_for('guru_add_kelas') }}">Buat kelas baru</a></p>
+        {% endif %}
+    </div>
+    
+    <div>
+        <h2>Menu Guru</h2>
+        <ul>
+            <li><a href="{{ url_for('guru_kelas') }}">Kelola Semua Kelas</a></li>
+            <li><a href="{{ url_for('guru_add_kelas') }}">Buat Kelas Baru</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

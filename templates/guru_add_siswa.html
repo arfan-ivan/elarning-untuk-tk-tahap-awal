@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Siswa ke Kelas - {{ kelas.nama_kelas }} - E-Learning{% endblock %}
+
+{% block content %}
+<div class="tambah-siswa-container">
+    <h1>Tambah Siswa ke Kelas - {{ kelas.nama_kelas }}</h1>
+    
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <div class="form-container">
+        <form method="POST">
+            <div class="form-group">
+                <label for="siswa_id">Pilih Siswa:</label>
+                <select id="siswa_id" name="siswa_id" required>
+                    <option value="">-- Pilih Siswa --</option>
+                    {% for siswa in siswa_available %}
+                    <option value="{{ siswa.id }}">{{ siswa.nama_lengkap }} ({{ siswa.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="submit" value="Tambah Siswa">
+                <a href="{{ url_for('guru_kelas_siswa', kelas_id=kelas.id) }}">Batal</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="student-list">
+        <h3>Siswa yang Tersedia ({{ siswa_available|length }} siswa)</h3>
+        {% if siswa_available %}
+        <ul>
+            {% for siswa in siswa_available %}
+            <li>{{ siswa.nama_lengkap }} ({{ siswa.username }}) - {{ siswa.email }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="no-students">Tidak ada siswa yang tersedia untuk ditambahkan.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Styling untuk halaman tambah siswa - Tema Biru */
+
+/* Container utama */
+.tambah-siswa-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Styling untuk judul halaman */
+.tambah-siswa-container h1 {
+    color: #1e3a8a;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #3b82f6;
+    position: relative;
+}
+
+.tambah-siswa-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    border-radius: 2px;
+}
+
+/* Flash Messages Styling */
+.flash-messages {
+    margin-bottom: 25px;
+}
+
+.flash-message {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideInDown 0.5s ease-out;
+}
+
+.flash-message.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-left: 4px solid #047857;
+}
+
+.flash-message.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border-left: 4px solid #b91c1c;
+}
+
+.flash-message.info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-left: 4px solid #1d4ed8;
+}
+
+/* Form Container */
+.form-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+/* Select Styling */
+.form-container select {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%232563eb"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+    padding-right: 50px;
+}
+
+.form-container select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Button Styling */
+.btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-container input[type="submit"] {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-container input[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+}
+
+.form-container a {
+    background: #6b7280;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.form-container a:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
+}
+
+/* Section Header */
+.section-header {
+    color: #1e293b;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tambah-siswa-container h3 {
+    color: #1e293b;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+/* Student List Container */
+.student-list {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.05);
+}
+
+/* Student List */
+.student-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.student-list li {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.student-list li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: #2563eb;
+}
+
+/* No Students Message */
+.no-students {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 40px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+    margin-top: 20px;
+}
+
+/* Animations */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container, .student-list {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tambah-siswa-container {
+        padding: 15px;
+    }
+    
+    .tambah-siswa-container h1 {
+        font-size: 1.8rem;
+    }
+    
+    .form-container, .student-list {
+        padding: 20px;
+    }
+    
+    .student-list ul {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .form-container input[type="submit"],
+    .form-container a {
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}</style>
+{% endblock %}
